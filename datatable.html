@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Data Display</title>
+</head>
+<body>
+<h1>Data Display</h1>
+
+<input type="text" id="search-input" placeholder="Search">
+<h1> </h1>
+<table id="data-table">
+  <thead>
+  <tr>
+    <th>Date</th>
+    <th>Name</th>
+    <th>Price</th>
+  </tr>
+  </thead>
+  <tbody id="data-body"></tbody>
+</table>
+<button onclick="goToInsertPage()">回到新增頁面</button>
+
+<script>
+  const searchInput = document.getElementById('search-input');
+  const tableBody = document.getElementById('data-body');
+  let data = []; // 存储原始数据
+
+  async function fetchData() {
+    const url = "http://localhost:3000/api"; // 数据的 API URL
+    try {
+      const response = await fetch(url);
+      data = await response.json();
+      updateTable();
+
+    } catch (error) {
+      console.log("错误", error);
+    }
+  }
+
+  function updateTable() {
+    tableBody.innerHTML = ''; // 清空表格内容
+
+    const searchValue = searchInput.value.trim().toLowerCase(); // 获取搜索输入值并进行小写处理
+    const filteredData = data.filter(entry =>
+            entry.date.toLowerCase().includes(searchValue) ||
+            entry.name.toLowerCase().includes(searchValue) ||
+            entry.price.toLowerCase().includes(searchValue)
+    );
+
+    filteredData.forEach(entry => {
+      const row = document.createElement('tr');
+      const dateCell = document.createElement('td');
+      const nameCell = document.createElement('td');
+      const priceCell = document.createElement('td');
+
+      dateCell.textContent = entry.date;
+      nameCell.textContent = entry.name;
+      priceCell.textContent = entry.price;
+
+      row.appendChild(dateCell);
+      row.appendChild(nameCell);
+      row.appendChild(priceCell);
+
+      tableBody.appendChild(row);
+    });
+  }
+
+  searchInput.addEventListener('input', updateTable);
+
+  function goToInsertPage() {
+    window.location.href = "data.html";
+  }
+
+  fetchData();
+</script>
+</body>
+</html>
